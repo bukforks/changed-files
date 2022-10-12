@@ -26,6 +26,9 @@ jobs:
       - id: set-output
         run: OUTPUT=$(echo ${{ steps.changed-files.outputs.all_changed_files }} | jq '. | map(split("/")[0]) | unique | tojson')
 
+      - id: print-output
+        run: echo $OUTPUT
+
       - id: set-matrix
         run: echo "::set-output name=matrix::$OUTPUT"
 
