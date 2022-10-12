@@ -19,12 +19,13 @@ jobs:
         uses: ./
         with:
           json: true
+
       - name: List all changed files
         run: |
           echo '${{ steps.changed-files.outputs.all_changed_files }}'
 
       - id: set-output
-        run: OUTPUT=$(echo ${{ steps.changed-files.outputs.all_changed_files }} | jq '. | map(split("/")[0]) | unique | tojson')
+        run: export OUTPUT=$(echo ${{ steps.changed-files.outputs.all_changed_files }} | jq '. | map(split("/")[0]) | unique | tojson')
 
       - id: print-output
         run: echo $OUTPUT
@@ -47,3 +48,4 @@ jobs:
       - name: Test
         run: |
           echo ${{ matrix.container }}
+
