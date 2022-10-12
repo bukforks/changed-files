@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      matrix-jq: ${{ steps.set-matrix-jq.outputs.matrix-jq }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -26,12 +27,19 @@ jobs:
       - id: set-matrix
         run: echo "::set-output name=matrix::{\"container\":${{ steps.changed-files.outputs.all_changed_files }}}"
 
+      - id: set-matrix-jq
+        run:
+          DATA=$(echo ${{ steps.changed-files.outputs.all_changed_files }} | jq -c '. | map(split("/")[0]) | unique')
+          echo "matrix-jq=$DATA" >> "$GITHUB_OUTPUT"
+
   matrix-job:
     name: Run Matrix Job
     runs-on: ubuntu-latest
     needs: [changed-files]
     strategy:
-      matrix: ${{ fromJSON(needs.changed-files.outputs.matrix) }}
+      matrix:
+        set-matrix: ${{ fromJSON(needs.changed-files.outputs.matrix) }}
+        set-matrix-jq: ${{ fromJSON(needs.changed-files.outputs.matrix-jq) }}
       max-parallel: 4
       fail-fast: false
     steps:
